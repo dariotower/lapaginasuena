@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mancha sonora · v24 composición con tempo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js"></script>
+<style>
+:root{--bg:#f6f4ef;--paper:#fffdfa;--ink:#0f0e0d;--muted:#706a62;--line:#ded8cf;--accent:#ff5a2c}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 80% 0,#fff,transparent 30%),var(--bg);color:var(--ink);font-family:Montserrat,system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:-.04em}
+.app{width:min(1180px,calc(100% - 30px));margin:18px auto 70px}
+.nav{min-height:64px;border:1px solid var(--line);background:#fffdfaCC;backdrop-filter:blur(18px);border-radius:22px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:14px;z-index:20;box-shadow:0 12px 35px #0000000b}
+.brand{display:flex;gap:14px;align-items:center;font-weight:800}.logo{width:30px;height:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;transform:rotate(45deg)}.logo i{width:7px;height:7px;border-radius:50%;background:var(--ink);place-self:center}.logo i:nth-child(2),.logo i:nth-child(4),.logo i:nth-child(6),.logo i:nth-child(8){background:transparent}.menu{display:flex;gap:46px;font-size:15px;font-weight:400}
+.btn{border:0;background:var(--ink);color:white;border-radius:15px;min-height:48px;padding:14px 20px;font:600 15px/1 Montserrat,system-ui;cursor:pointer;display:inline-flex;align-items:center;gap:12px}.btn.secondary{background:var(--paper);color:var(--ink);border:1px solid var(--line)}.btn:disabled{opacity:.35;cursor:not-allowed}
+.hero{padding:70px 26px 36px}.dot-title{margin:0;font:900 clamp(54px,9vw,124px)/.88 Montserrat,system-ui;text-transform:uppercase;letter-spacing:-.085em}.lead{font-size:23px;line-height:1.38;max-width:590px;margin:34px 0 70px;color:#292623;font-weight:400}
+.diagram{display:grid;grid-template-columns:1fr minmax(260px,340px) 1fr;align-items:center;gap:28px}.side{display:grid;gap:34px}.row{display:flex;align-items:center;gap:18px}.left .row{justify-content:flex-end}.pill{min-width:132px;height:52px;border:1px solid var(--line);background:#fffdfaBB;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:15px}.node{width:7px;height:7px;background:var(--ink);border-radius:50%}.wire{height:1px;background:var(--line);flex:1;max-width:150px}.core{min-height:250px;border:1px solid var(--line);border-radius:42px;background:linear-gradient(145deg,#fffdfa,#ebe6dc);display:grid;place-items:center;box-shadow:inset 0 0 0 16px #ffffff77}.corein{display:flex;gap:24px;align-items:center}.paper{width:82px;height:112px;border:1px solid #aaa49b;border-radius:12px;background:#f8f6f1;padding:16px 12px;box-shadow:5px 5px 0 #0001}.paper b{font-size:28px}.paper i{display:block;height:4px;background:#272522;margin:7px 0;border-radius:4px;opacity:.7}.wave{display:flex;gap:6px;align-items:center}.wave i{width:5px;border-radius:8px;background:var(--ink)}.wave i:nth-child(1){height:22px}.wave i:nth-child(2){height:48px}.wave i:nth-child(3){height:70px}.wave i:nth-child(4){height:36px}.wave i:nth-child(5){height:58px}.wave i:nth-child(6){height:26px}
+.cards{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:28px;overflow:hidden;background:#fffdfa99}.card{padding:34px;border-right:1px solid var(--line)}.card:last-child{border-right:0}.dot{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle,var(--ink) 24%,transparent 28%) 0 0/7px 7px;opacity:.7}.card h3{font-size:25px;margin:18px 0 8px}.card p{color:#56514a;line-height:1.45}
+.prototype{padding:26px;display:grid;grid-template-columns:1.05fr .95fr;gap:24px;border:1px solid var(--line);border-radius:34px;background:#fffdfa99}.reader{padding:22px}.stage{min-height:620px;border:1px dashed #bdb7ad;background:#f8f5ef;border-radius:26px;display:grid;place-items:center;overflow:hidden;position:relative}.empty{text-align:center;max-width:530px;padding:30px}.empty h2{font-size:42px;line-height:.98;margin:0 0 12px}.empty p{color:var(--muted);font-size:18px;line-height:1.42}.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}.preview{max-width:100%;max-height:620px;border-radius:18px;display:none;background:white;z-index:2}.overlay{position:absolute;inset:0;display:none;pointer-events:none;mix-blend-mode:multiply;z-index:4}.play{position:absolute;inset:0;display:none;z-index:5;pointer-events:none}.play.on{display:block}.scan{position:absolute;left:0;right:0;height:2px;background:var(--ink);opacity:.65;animation:scan 7s linear infinite}.breath{position:absolute;inset:0;background:radial-gradient(circle,transparent 35%,rgba(255,90,44,.12) 58%,transparent 72%);animation:breath 4.5s ease-in-out infinite}@keyframes scan{from{transform:translateY(-12px)}to{transform:translateY(700px)}}@keyframes breath{0%,100%{opacity:.06;transform:scale(1)}50%{opacity:.25;transform:scale(1.03)}}
+.controls{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;margin-top:16px}.statusbox{border:1px solid var(--line);background:#f8f5ef;border-radius:18px;padding:15px 18px;color:#4d4941;font-size:14px;line-height:1.35}.info{padding:22px;display:grid;gap:14px}.infohead{display:flex;justify-content:space-between;gap:18px}.infohead h2{font-size:36px;line-height:.95;margin:0}.small{color:var(--muted);font-size:14px;text-align:right;max-width:180px}.metric{border:1px solid var(--line);border-radius:24px;background:var(--paper);padding:18px}.big{font-size:30px;line-height:.98;margin:0 0 12px}.metric p{color:#4c4740;line-height:1.38}.mhead{display:flex;justify-content:space-between}.val{font-family:Montserrat,system-ui;font-size:22px;font-weight:700}.bar{height:8px;background:#e8e2d8;border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--ink);border-radius:999px}.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.tag{border:1px solid var(--line);border-radius:999px;background:#f5f1e9;padding:8px 10px;font-size:13px}.beatgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:5px}.step{height:28px;border:1px solid var(--line);border-radius:8px;background:#fbfaf6;opacity:.55}.step.beat{background:#ede5d9}.step.active{background:var(--accent);border-color:var(--accent);opacity:1;transform:translateY(-3px)}textarea{width:100%;min-height:100px;border:1px solid var(--line);border-radius:20px;background:#f7f3eb;padding:15px;font:15px/1.4 Montserrat,system-ui;letter-spacing:-.02em}.hidden{display:none}.footer{text-align:center;font-size:44px;margin-top:78px;border-top:1px solid var(--line);padding-top:58px;line-height:1.15}.footer em{font-family:Georgia,serif}
+@media(max-width:1050px){.menu{display:none}.diagram,.prototype{grid-template-columns:1fr}.wire{display:none}.left .row,.right .row{justify-content:center}.cards{grid-template-columns:1fr}.card{border-right:0;border-bottom:1px solid var(--line)}.controls{grid-template-columns:1fr}.dot-title{font-size:clamp(46px,13vw,90px)}}
+</style>
+</head>
+<body><main class="app">
+<nav class="nav"><div class="brand"><div class="logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span>Mancha sonora</span></div><div class="menu"><span>Proyecto</span><span>Cómo funciona</span><span>Prototipo</span><span>Contacto</span></div><button class="btn" onclick="document.querySelector('#prototipo').scrollIntoView({behavior:'smooth'})">Probar demo →</button></nav>
+<section class="hero"><h1 class="dot-title">MANCHA<br>SONORA.</h1><p class="lead">Una herramienta que interpreta texto, mancha tipográfica, jerarquía, tensión editorial y respiración visual como una composición musical.</p>
+<div class="diagram"><div class="side left"><div class="row"><div class="pill">A&nbsp; Texto</div><div class="node"></div><div class="wire"></div></div><div class="row"><div class="pill">⌁&nbsp; Tono</div><div class="node"></div><div class="wire"></div></div><div class="row"><div class="pill">▦&nbsp; Mancha</div><div class="node"></div><div class="wire"></div></div><div class="row"><div class="pill">⌜⌟&nbsp; Márgenes</div><div class="node"></div><div class="wire"></div></div></div><div><div class="core"><div class="corein"><div class="paper"><b>A</b><i></i><i></i><i></i><i></i><i></i></div><div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div style="display:flex;justify-content:center;margin-top:46px"><button class="btn" onclick="document.querySelector('#prototipo').scrollIntoView({behavior:'smooth'})">Ver prototipo →</button></div></div><div class="side right"><div class="row"><div class="wire"></div><div class="node"></div><div class="pill">▦&nbsp; Grilla</div></div><div class="row"><div class="wire"></div><div class="node"></div><div class="pill">—&nbsp; Silencio</div></div><div class="row"><div class="wire"></div><div class="node"></div><div class="pill">≋&nbsp; Ritmo</div></div><div class="row"><div class="wire"></div><div class="node"></div><div class="pill">▥&nbsp; Música</div></div></div></div>
+<div class="cards"><article class="card"><div class="dot"></div><h3>Tono narrativo</h3><p>El texto y el color orientan modo, registro y temperatura emocional.</p></article><article class="card"><div class="dot" style="border-radius:4px"></div><h3>Peso visual</h3><p>La densidad define cuerpo; la línea base ordena el pulso; color e interrupciones abren tensión.</p></article><article class="card"><div class="dot" style="height:28px;border-radius:0"></div><h3>Respiración</h3><p>Los márgenes, blancos, imágenes e interrupciones modifican fluidez, silencio y disonancia.</p></article></div></section>
+
+<section class="prototype" id="prototipo"><div class="reader"><div class="stage" id="drop"><div class="empty" id="empty"><h2>Cargá una página.</h2><p>La imagen se muestra inmediatamente. Después el sistema detecta líneas base y arma el pulso desde esa grilla.</p><div class="actions"><button class="btn" id="galleryBtn">Galería / archivo →</button><button class="btn secondary" id="cameraBtn">Tomar foto</button></div></div><img id="preview" class="preview"><canvas id="work" class="hidden"></canvas><canvas id="overlay" class="overlay"></canvas><div id="play" class="play"><div class="breath"></div><div class="scan"></div></div></div><div class="controls"><div class="statusbox" id="now">Sin lectura todavía.</div><button class="btn secondary" id="galleryBtn2">Galería</button><button class="btn" id="readBtn" disabled>Leer página</button><button class="btn secondary" id="testBtn">Probar audio</button></div><input id="galleryInput" class="hidden" type="file" accept="image/*"><input id="cameraInput" class="hidden" type="file" accept="image/*" capture="environment"></div>
+<aside class="info"><div class="infohead"><h2>Identidad<br>sonora</h2><div id="status" class="small">Esperando imagen</div></div><textarea id="textInput" placeholder="Opcional: pegá texto para sumar tono narrativo."></textarea><article class="metric"><h3>Lectura del ejecutante</h3><p class="big" id="identityMain">Todavía no hay página.</p><p id="identityText">Cargá una imagen y tocá “Leer página”.</p><div class="tags" id="tags"><span class="tag">sin texto</span></div></article><article class="metric"><div class="mhead"><h3>Peso / mancha</h3><span class="val" id="weightValue">--</span></div><div class="bar"><i id="weightBar"></i></div></article><article class="metric"><div class="mhead"><h3>Respiración / margen</h3><span class="val" id="breathValue">--</span></div><div class="bar"><i id="breathBar"></i></div></article><article class="metric"><div class="mhead"><h3>Orden / grilla</h3><span class="val" id="orderValue">--</span></div><div class="bar"><i id="orderBar"></i></div></article><article class="metric"><div class="mhead"><h3>Temperatura / color</h3><span class="val" id="emotionValue">--</span></div><div class="bar"><i id="emotionBar"></i></div></article><article class="metric"><div class="mhead"><h3>Fluidez editorial</h3><span class="val" id="editorialValue">--</span></div><div class="bar"><i id="editorialBar"></i></div><p id="editorialHint" style="margin:10px 0 0;color:#706a62;font-size:13px;line-height:1.35">Detecta tensión por líneas largas, interrupciones visuales, folios, títulos y cortes reales de lectura.</p></article><article class="metric"><div class="mhead"><h3>Compás / evolución</h3><span class="val">4/4</span></div><div class="beatgrid" id="beatGrid"></div><div class="actions" style="justify-content:flex-start;margin-top:16px"><button class="btn" id="listenBtn" disabled>Componer con tempo</button><button class="btn secondary" id="stopBtn" disabled>Detener</button></div></article></aside></section><section class="footer">Diseñar una página<br>también es componer su <em>silencio.</em></section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id), preview=$('preview'), empty=$('empty'), status=$('status'), now=$('now'), work=$('work'), ctx=work.getContext('2d',{willReadFrequently:true}), overlay=$('overlay'), octx=overlay.getContext('2d'), play=$('play');
+let sourceImage=null,A=null,score=null,tones=[],piano=null,cello=null,drums={},rev=null,delay=null,percBus=null,stringBus=null,samplerReady=false,tickTimer=null,compositionTimers=[],globalStep=0,layers={},activeNodes=[];
+for(let i=0;i<16;i++){let s=document.createElement('div');s.className='step'+(i%4===0?' beat':'');s.dataset.step=i;$('beatGrid').appendChild(s)}
+function msg(a,b){status.textContent=a;now.textContent=b}
+$('galleryBtn').onclick=()=>$('galleryInput').click();$('galleryBtn2').onclick=()=>$('galleryInput').click();$('cameraBtn').onclick=()=>$('cameraInput').click();
+$('galleryInput').onchange=e=>{let f=e.target.files[0];if(f)loadFile(f);e.target.value=''};$('cameraInput').onchange=e=>{let f=e.target.files[0];if(f)loadFile(f);e.target.value=''};
+async function loadFile(file){stopAudio({silent:true});clearOv();msg('Cargando imagen','Abriendo archivo…');let url=URL.createObjectURL(file);try{let img=await loadImage(url);sourceImage=img;preview.src=url;preview.style.display='block';empty.style.display='none';$('readBtn').disabled=false;$('listenBtn').disabled=true;$('stopBtn').disabled=true;msg('Imagen cargada','Imagen cargada. Tocá “Leer página”.')}catch(e){msg('Error al cargar','No pude abrir la imagen. Probá JPG/PNG o sacá una foto nueva.');URL.revokeObjectURL(url)}}
+function loadImage(url){return new Promise((res,rej)=>{let im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=url})}
+$('readBtn').onclick=()=>{
+  if(!sourceImage)return;
+  try{
+    A=analyze(sourceImage);
+    tones=textTone($('textInput').value);
+    score=makeScore(A);
+    render(A);
+    drawOv(A);
+    $('listenBtn').disabled=false;
+    $('stopBtn').disabled=false;
+    msg('Lectura completa','La página ya tiene identidad sonora. Tocá “Componer con tempo”.');
+  }catch(e){
+    console.error('Error al leer página',e);
+    msg('Error de lectura','No pude interpretar la página. Revisá la consola o probá otra imagen.');
+  }
+};
+function analyze(img){
+  let sw=img.naturalWidth||img.width,sh=img.naturalHeight||img.height;
+  let ratio=Math.min(1,1000/sw),w=Math.round(sw*ratio),h=Math.round(sh*ratio);
+  work.width=w;work.height=h;
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(img,0,0,w,h);
+
+  let d=ctx.getImageData(0,0,w,h).data;
+  let row=Array(h).fill(0),dark=0,mid=0,minX=w,minY=h,maxX=0,maxY=0;
+  let colorStats=analyzeColor(d,w,h);
+
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      let i=(y*w+x)*4;
+      let L=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];
+      if(L<194)mid++;
+      if(L<156){
+        dark++;
+        row[y]++;
+        minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+        minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+      }
+    }
+  }
+
+  if(dark<40){
+    let emptyEditorial={score:0,quality:1,longLine:0,widow:0,orphan:0,interruption:0,imbalance:0,imageBlocks:[],titleLines:[],folioLines:[],bodyLines:[]};
+    return{w,h,weight:0,breath:1,order:0,bbox:{x:0,y:0,w,h},lines:[],bodyLines:[],titleLines:[],folioLines:[],pars:[],bpm:68,baselineGap:0,gridQuality:0,color:colorStats,emotion:colorEmotion(colorStats,0,1,[]),editorial:emptyEditorial};
+  }
+
+  let bbox={x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1};
+  let margins=(minX/w+(w-maxX)/w+minY/h+(h-(minY+(maxY-minY+1)))/h);
+  let weight=clamp((dark/(w*h))*8+(bbox.w*bbox.h/(w*h))*.17);
+  let breath=clamp(margins/.72*.78+(1-clamp((mid/(w*h))*4))*.22);
+
+  let allLines=linesFromRows(row,w,h,bbox);
+  let zones=classifyPageZones(allLines,w,h,bbox);
+  let bodyLines=zones.bodyLines;
+
+  let grid=baselineGrid(bodyLines);
+  let pars=paragraphs(bodyLines);
+  let order=clamp(weight*.18 + grid.quality*.62 + (bodyLines.length/72)*.18 - breath*.10);
+  let bpm=Math.round(56+order*38+weight*10-breath*6);
+  let emotion=colorEmotion(colorStats,weight,breath,bodyLines);
+  let editorial=editorialDiagnostics(d,w,h,bbox,bodyLines,pars,colorStats,weight,breath,zones);
+
+  return{
+    w,h,weight,breath,order,bbox,
+    lines:allLines,
+    bodyLines,
+    titleLines:zones.titleLines,
+    folioLines:zones.folioLines,
+    pars,bpm,
+    baselineGap:grid.gap,
+    gridQuality:grid.quality,
+    rowProjection:row,
+    color:colorStats,
+    emotion,
+    editorial
+  };
+}
+
+function classifyPageZones(lines,w,h,bbox){
+  let sorted=lines.slice().sort((a,b)=>a.baseline-b.baseline);
+  let folioLines=[];
+  let titleLines=[];
+  let bodyLines=[];
+
+  // Folio: elemento bajo, corto, aislado. No debe entrar al ritmo principal.
+  sorted.forEach(l=>{
+    let isFolio=(l.baseline>h*.86 && l.length<.18 && (l.y1-l.y0)<h*.035);
+    if(isFolio){
+      l.role='folio';
+      folioLines.push(l);
+    }
+  });
+
+  let withoutFolio=sorted.filter(l=>l.role!=='folio');
+
+  // Título/cabezal: primeras líneas antes del primer salto amplio y con centro alto.
+  if(withoutFolio.length){
+    let gaps=[];
+    for(let i=1;i<withoutFolio.length;i++)gaps.push(withoutFolio[i].baseline-withoutFolio[i-1].baseline);
+    let normalGap=0;
+    if(gaps.length){
+      let gs=gaps.slice().sort((a,b)=>a-b);
+      normalGap=gs[Math.floor(gs.length*.45)]||gs[0]||0;
+    }
+    let firstBreak=-1;
+    for(let i=1;i<withoutFolio.length;i++){
+      let g=withoutFolio[i].baseline-withoutFolio[i-1].baseline;
+      if(normalGap && g>normalGap*1.75 && withoutFolio[i-1].baseline<h*.32){
+        firstBreak=i;
+        break;
+      }
+    }
+    withoutFolio.forEach((l,i)=>{
+      let high=l.baseline<h*.28;
+      let beforeBody=firstBreak>0 && i<firstBreak;
+      let titleLike=high && (beforeBody || l.strength>.22 || (l.y1-l.y0)>h*.018);
+      if(titleLike){
+        l.role='title';
+        titleLines.push(l);
+      }
+    });
+  }
+
+  bodyLines=withoutFolio.filter(l=>l.role!=='title');
+
+  // Si la detección de título se llevó demasiado, recupera líneas.
+  if(bodyLines.length<3 && withoutFolio.length>=3){
+    titleLines=[];
+    bodyLines=withoutFolio;
+  }
+
+  return{titleLines,folioLines,bodyLines};
+}
+
+function editorialDiagnostics(data,w,h,bbox,lines,pars,colorStats,weight,breath,zones={}){
+  let avgCharWidth=7.1; // estimación visual promedio en px luego del reescalado
+  let longScores=[];
+  lines.forEach(l=>{
+    let estimatedChars=(l.w||bbox.w)/avgCharWidth;
+    longScores.push(clamp((estimatedChars-66)/28));
+  });
+  let longLine=longScores.length?longScores.reduce((a,b)=>a+b,0)/longScores.length:0;
+
+  // Viudas / huérfanas aproximadas:
+  // No se penaliza la última línea de la página si queda como arrastre hacia la página siguiente.
+  // Solo se marca si la línea corta está dentro de la página y cierra un bloque antes de otro bloque.
+  let widow=0, orphan=0;
+  pars.forEach((p,pi)=>{
+    let first=lines[p.s], last=lines[p.end];
+    let hasNextParagraph=pi<pars.length-1;
+    let hasPrevParagraph=pi>0;
+    let blockLines=p.end-p.s+1;
+
+    if(first && hasPrevParagraph && blockLines===1 && first.length<.35){
+      orphan=Math.max(orphan,.70);
+    }
+
+    if(last && hasNextParagraph && blockLines>=2 && last.length<.26){
+      widow=Math.max(widow,.72);
+    }
+  });
+
+  let imageBlocks=detectInterruptions(data,w,h,bbox,lines,colorStats);
+  let interruption=0;
+  imageBlocks.forEach(b=>{
+    let area=(b.w*b.h)/(w*h);
+    let centerPenalty=(b.y>bbox.y+bbox.h*.16 && b.y+b.h<bbox.y+bbox.h*.86)?1:.65;
+    interruption=Math.max(interruption,clamp(area*8*centerPenalty));
+  });
+
+  // Forma/contraforma: caja muy corrida hacia un lado o blancos desparejos.
+  let bodyBox=bodyBBox(lines,bbox);
+  let left=bodyBox.x/w, right=(w-(bodyBox.x+bodyBox.w))/w, top=bodyBox.y/h, bottom=(h-(bodyBox.y+bodyBox.h))/h;
+  let imbalance=clamp(Math.abs(left-right)*1.8 + Math.abs(top-bottom)*.8);
+
+  // Folio y título no son errores: se registran como orientación/jerarquía.
+  let hierarchy=clamp(((zones.titleLines?.length||0)>0?.45:0) + ((zones.folioLines?.length||0)>0?.25:0) + (lines.length>0?.20:0));
+
+  let score=clamp(longLine*.30 + widow*.17 + orphan*.14 + interruption*.30 + imbalance*.09 - hierarchy*.10);
+  let quality=clamp(1-score);
+
+  return{
+    score,quality,longLine,widow,orphan,interruption,imbalance,hierarchy,
+    imageBlocks,
+    titleLines:zones.titleLines||[],
+    folioLines:zones.folioLines||[],
+    bodyLines:lines
+  };
+}
+
+function bodyBBox(lines,fallback){
+  if(!lines||!lines.length)return fallback;
+  let minX=Infinity,minY=Infinity,maxX=0,maxY=0;
+  lines.forEach(l=>{
+    minX=Math.min(minX,l.x);
+    maxX=Math.max(maxX,l.x+l.w);
+    minY=Math.min(minY,l.y0);
+    maxY=Math.max(maxY,l.y1);
+  });
+  return{x:minX,y:minY,w:maxX-minX,h:maxY-minY};
+}
+
+function detectInterruptions(data,w,h,bbox,lines,colorStats){
+  // Busca bloques no textuales dentro de la caja de lectura:
+  // regiones con color/saturación o masa continua que cortan la secuencia de líneas.
+  let blocks=[];
+  let stepY=Math.max(4,Math.round(h*.008));
+  let rowColor=[];
+  let lineMask=Array(h).fill(false);
+  lines.forEach(l=>{
+    let a=Math.max(0,Math.round(l.y0-2)),b=Math.min(h-1,Math.round(l.y1+2));
+    for(let y=a;y<=b;y++)lineMask[y]=true;
+  });
+
+  for(let y=bbox.y;y<bbox.y+bbox.h;y+=stepY){
+    let colored=0,darkWide=0,total=0;
+    for(let x=bbox.x;x<bbox.x+bbox.w;x+=4){
+      let i=(y*w+x)*4;
+      let r=data[i],g=data[i+1],b=data[i+2];
+      let hsv=rgbToHsv(r,g,b);
+      let L=.2126*r+.7152*g+.0722*b;
+      total++;
+      if(hsv.s>.20 && hsv.v>.22 && !(hsv.v>.92&&hsv.s<.12)) colored++;
+      if(L<130) darkWide++;
+    }
+    let coloredRatio=colored/Math.max(1,total);
+    let darkRatio=darkWide/Math.max(1,total);
+    let noText=!lineMask[Math.min(h-1,Math.round(y))];
+    rowColor.push({y,hit:noText && (coloredRatio>.10 || darkRatio>.55),strength:Math.max(coloredRatio,darkRatio)});
+  }
+
+  let on=false,s=0,peak=0;
+  for(let i=0;i<rowColor.length;i++){
+    let r=rowColor[i];
+    if(r.hit&&!on){on=true;s=r.y;peak=r.strength;}
+    if(r.hit&&on)peak=Math.max(peak,r.strength);
+    if(!r.hit&&on){pushBlock(rowColor[i-1].y);on=false;}
+  }
+  if(on)pushBlock(rowColor[rowColor.length-1].y);
+
+  function pushBlock(e){
+    let bh=e-s+stepY;
+    if(bh>h*.035){
+      blocks.push({x:bbox.x,y:s,w:bbox.w,h:bh,strength:peak});
+    }
+  }
+
+  return blocks;
+}
+
+function analyzeColor(data,w,h){
+  let count=0,satSum=0,valSum=0,warm=0,cool=0,bright=0,dark=0,red=0,green=0,blue=0,yellow=0;
+  let step=Math.max(1,Math.floor((w*h)/45000));
+
+  for(let px=0;px<w*h;px+=step){
+    let i=px*4;
+    let r=data[i],g=data[i+1],b=data[i+2];
+    let hsv=rgbToHsv(r,g,b);
+    let s=hsv.s,v=hsv.v,h=hsv.h;
+    if(v>.92 && s<.12) continue;
+    if(v<.16) continue;
+    count++;
+    satSum+=s; valSum+=v;
+    if(v>.72) bright++;
+    if(v<.34) dark++;
+    if((h>=0&&h<55)||(h>=330&&h<=360)) warm++;
+    if(h>=180&&h<285) cool++;
+    if((h>=350||h<18)&&s>.28) red++;
+    if(h>=70&&h<165&&s>.24) green++;
+    if(h>=185&&h<260&&s>.22) blue++;
+    if(h>=35&&h<70&&s>.24) yellow++;
+  }
+
+  let total=Math.max(1,count);
+  return{
+    colorPresence:clamp(count/(w*h/step)*3),
+    saturation:clamp(satSum/total),
+    brightness:clamp(valSum/total),
+    warm:clamp(warm/total),
+    cool:clamp(cool/total),
+    brightRatio:clamp(bright/total),
+    darkRatio:clamp(dark/total),
+    red:clamp(red/total),
+    green:clamp(green/total),
+    blue:clamp(blue/total),
+    yellow:clamp(yellow/total)
+  };
+}
+
+function rgbToHsv(r,g,b){
+  r/=255;g/=255;b/=255;
+  let max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  let h=0;
+  if(d!==0){
+    if(max===r) h=60*(((g-b)/d)%6);
+    else if(max===g) h=60*((b-r)/d+2);
+    else h=60*((r-g)/d+4);
+  }
+  if(h<0) h+=360;
+  let s=max===0?0:d/max;
+  return{h,s,v:max};
+}
+
+function colorEmotion(c,weight,breath,lines){
+  let playful=clamp(c.colorPresence*.30 + c.saturation*.28 + c.brightness*.18 + breath*.16 + (lines.length<20?.16:0));
+  let luminous=clamp(c.brightness*.34 + c.yellow*.24 + c.green*.16 + breath*.20 - weight*.12);
+  let tender=clamp(breath*.25 + (lines.length<24?.18:0) + c.warm*.18 + c.saturation*.12 - weight*.08);
+  let dark=clamp(weight*.30 + c.darkRatio*.30 + c.blue*.16 + (1-c.brightness)*.20);
+  let tense=clamp(weight*.20 + c.red*.28 + (1-breath)*.22 + (lines.length>45?.18:0));
+  let scores={lúdica:playful,luminosa:luminous,tierna:tender,oscura:dark,tensa:tense};
+  let mood='visual',score=0;
+  Object.keys(scores).forEach(k=>{if(scores[k]>score){score=scores[k];mood=k;}});
+  return{mood,playful,luminous,tender,dark,tense,score};
+}
+
+function linesFromRows(row,w,h,b){
+  // Detección de líneas base:
+  // 1. suaviza proyección horizontal,
+  // 2. agrupa bandas de texto,
+  // 3. toma la línea base cerca del borde inferior del bloque,
+  // no el centro óptico de la mancha.
+  let smooth=Array(h).fill(0);
+  let radius=3;
+  for(let y=0;y<h;y++){
+    let acc=0,count=0;
+    for(let k=-radius;k<=radius;k++){
+      let yy=y+k;
+      if(yy>=0&&yy<h){acc+=row[yy];count++}
+    }
+    smooth[y]=acc/count;
+  }
+
+  let values=smooth.slice(b.y,Math.min(h,b.y+b.h)).filter(v=>v>0).sort((a,b)=>a-b);
+  let median=values.length?values[Math.floor(values.length*.55)]:0;
+  let maxv=Math.max(...smooth);
+  let th=Math.max(3,w*.006,median*.55,maxv*.08);
+
+  let bands=[];
+  let on=false,s=0,peak=0,peakY=0;
+
+  for(let y=0;y<h;y++){
+    let active=smooth[y]>th && y>=b.y-8 && y<=b.y+b.h+8;
+    if(active&&!on){on=true;s=y;peak=smooth[y];peakY=y}
+    if(active&&on&&smooth[y]>peak){peak=smooth[y];peakY=y}
+    if(!active&&on){pushBand(y-1);on=false}
+  }
+  if(on)pushBand(h-1);
+
+  function pushBand(e){
+    let height=e-s+1;
+    if(height<2)return;
+    // Descarta manchas raras muy altas salvo títulos; divide si parece más de una línea pegada.
+    let approxTextHeight=Math.max(6,Math.min(28,h*.035));
+    if(height>approxTextHeight*2.1){
+      let mid=Math.round((s+e)/2);
+      addLine(s,mid);
+      addLine(mid+1,e);
+    }else{
+      addLine(s,e);
+    }
+  }
+
+  function addLine(y0,y1){
+    let height=y1-y0+1;
+    let base=y0+height*.72; // aproximación de línea base
+    // Ajuste fino: busca el mayor peso en el tercio inferior.
+    let from=Math.max(y0,Math.round(y0+height*.45));
+    let to=Math.min(y1,Math.round(y0+height*.95));
+    let best=base,bestVal=-1;
+    for(let yy=from;yy<=to;yy++){
+      if(smooth[yy]>bestVal){bestVal=smooth[yy];best=yy}
+    }
+
+    bands.push({
+      y:base,
+      baseline:best,
+      y0:y0,
+      y1:y1,
+      strength:clamp(bestVal/Math.max(1,b.w)),
+      length:clamp(Math.max(...row.slice(y0,y1+1))/Math.max(1,w)),
+      x:b.x,
+      w:b.w
+    });
+  }
+
+  // Une dobles detecciones demasiado cercanas.
+  bands.sort((a,b)=>a.baseline-b.baseline);
+  let merged=[];
+  for(let line of bands){
+    let last=merged[merged.length-1];
+    if(last && Math.abs(line.baseline-last.baseline)<Math.max(4,h*.008)){
+      last.y0=Math.min(last.y0,line.y0);
+      last.y1=Math.max(last.y1,line.y1);
+      last.baseline=(last.baseline+line.baseline)/2;
+      last.y=last.baseline;
+      last.strength=Math.max(last.strength,line.strength);
+    }else{
+      merged.push(line);
+    }
+  }
+
+  return merged.filter(l=>l.baseline>=b.y-4&&l.baseline<=b.y+b.h+8);
+}
+
+function baselineGrid(lines){
+  if(lines.length<3)return{gap:0,quality:0};
+  let gaps=[];
+  for(let i=1;i<lines.length;i++){
+    let g=lines[i].baseline-lines[i-1].baseline;
+    if(g>2)gaps.push(g);
+  }
+  if(!gaps.length)return{gap:0,quality:0};
+
+  let sorted=gaps.slice().sort((a,b)=>a-b);
+  let median=sorted[Math.floor(sorted.length/2)];
+
+  // Ignora saltos de párrafo para medir interlínea base.
+  let regularGaps=gaps.filter(g=>g>median*.55&&g<median*1.55);
+  if(!regularGaps.length)regularGaps=gaps;
+
+  let avg=regularGaps.reduce((a,b)=>a+b,0)/regularGaps.length;
+  let variance=regularGaps.reduce((a,b)=>a+Math.pow(b-avg,2),0)/regularGaps.length;
+  let sd=Math.sqrt(variance);
+
+  let quality=clamp(1-sd/Math.max(1,avg*.55));
+  return{gap:avg,quality};
+}
+
+function paragraphs(lines){
+  if(!lines.length)return[];
+  let gaps=[];
+  for(let i=1;i<lines.length;i++)gaps.push(lines[i].baseline-lines[i-1].baseline);
+  let regular=gaps.slice().sort((a,b)=>a-b);
+  let med=regular.length?regular[Math.floor(regular.length/2)]:0;
+  let out=[],s=0;
+  for(let i=1;i<lines.length;i++){
+    let gap=lines[i].baseline-lines[i-1].baseline;
+    if(med && gap>med*1.55){
+      out.push({s,end:i-1});
+      s=i;
+    }
+  }
+  out.push({s,end:lines.length-1});
+  return out;
+}
+function textTone(text){
+  let t=text.toLowerCase();
+  let map=[
+    ['oscuro',['sombra','noche','muerte','dolor','miedo','silencio','fantasma','olvido','triste','soledad','oscuro','ausencia']],
+    ['luminoso',['luz','día','claro','alegría','risa','cielo','sol','vida','brillo','flor','aire','color','colores']],
+    ['íntimo',['cuerpo','casa','madre','mujer','voz','piel','recuerdo','secreto','carta','mirada','nombre']],
+    ['tenso',['golpe','huida','grito','furia','corte','sangre','apuro','temblor','amenaza']],
+    ['lúdico',['niño','niña','juego','jugar','risa','reír','cuento','animal','animales','bosque','amigo','amiga','magia','aventura','sol','luna']]
+  ];
+  return map.map(g=>({name:g[0],score:g[1].reduce((a,w)=>a+(t.match(new RegExp('\\b'+w+'\\b','g'))||[]).length,0)})).filter(x=>x.score).sort((a,b)=>b.score-a.score).map(x=>x.name);
+}
+function makeScore(a){
+  return buildCompositionPlan(a);
+}
+
+
+function scaleFor(a,t){
+  let mood=a?.emotion?.mood||'visual';
+  if(t.includes('lúdico')||mood==='lúdica') return ['C4','D4','E4','G4','A4','C5','D5','E5'];
+  if(t.includes('luminoso')||mood==='luminosa') return ['D3','E3','F#3','A3','B3','D4','E4','F#4'];
+  if(mood==='tierna') return ['F3','G3','A3','C4','D4','F4','G4','A4'];
+  if(t.includes('oscuro')||mood==='oscura') return ['A2','B2','C3','E3','G3','A3','C4','E4'];
+  if(t.includes('tenso')||mood==='tensa') return ['C3','C#3','D#3','F#3','G3','A#3','C4','D#4'];
+  return ['C3','D#3','F3','G3','A#3','C4','D#4','G4'];
+}
+
+function tenseNeighbor(note){
+  const map={
+    C2:'C#2',D2:'D#2',E2:'F2',F2:'F#2',G2:'G#2',A2:'A#2',B2:'C3',
+    C3:'C#3',D3:'D#3',E3:'F3',F3:'F#3',G3:'G#3',A3:'A#3',B3:'C4',
+    C4:'C#4',D4:'D#4',E4:'F4',F4:'F#4',G4:'G#4',A4:'A#4',B4:'C5',
+    C5:'C#5',D5:'D#5',E5:'F5',F5:'F#5',G5:'G#5',A5:'A#5'
+  };
+  return map[note]||'C#4';
+}
+
+function buildCompositionPlan(a){
+  let mood=a.emotion?.mood||'visual';
+  let editorial=a.editorial||{score:0,quality:1};
+  let body=a.bodyLines||a.lines||[];
+
+  let scale=scaleFor(a,tones);
+  let seed=compositionSeed(a,body);
+  let register=registerForMood(mood,a);
+  let density=clamp(.22 + a.weight*.25 + (1-a.breath)*.18 + editorial.score*.12);
+  let dissonance=clamp(editorial.score*.72 + (mood==='tensa'?.25:0));
+  let brightness=clamp((a.emotion?.luminous||0)*.45 + (a.emotion?.playful||0)*.35 + a.breath*.20);
+  let gravity=clamp(a.weight*.45 + (mood==='oscura'?.36:0) + editorial.score*.14);
+  let pulse=clamp(a.order*.55 + a.gridQuality*.30 - editorial.score*.18);
+  let spaciousness=clamp(a.breath*.65 + (1-density)*.28);
+
+  let motif=makeMotif(scale,mood,seed,register);
+  let answer=makeAnswer(scale,mood,seed,register);
+  let bass=makeBass(mood,gravity);
+  let harmonic=makeHarmony(scale,mood,gravity,brightness);
+
+  let readingType='equilibrada';
+  if(editorial.score>.42) readingType='friccionada';
+  else if(mood==='oscura') readingType='oscura';
+  else if(mood==='lúdica'||mood==='luminosa') readingType='luminosa';
+  else if(a.breath>.62) readingType='respirada';
+
+  return{
+    type:'composition',
+    seed,mood,readingType,scale,motif,answer,bass,harmonic,
+    density,dissonance,brightness,gravity,pulse,spaciousness,
+    bpm:a.bpm,
+    bodyCount:body.length,
+    titleCount:(a.titleLines||[]).length,
+    folioCount:(a.folioLines||[]).length,
+    interruptions:editorial.interruption||0,
+    longLine:editorial.longLine||0,
+    quality:editorial.quality||1
+  };
+}
+
+function compositionSeed(a,body){
+  let s=Math.round(a.weight*1000)+Math.round(a.breath*700)+Math.round(a.order*1300)+Math.round((a.emotion?.score||0)*900)+Math.round((a.editorial?.score||0)*1600);
+  body.forEach((l,i)=>{s+=Math.round((l.baseline||l.y)*.7 + (l.length||0)*100 + i*17);});
+  return Math.abs(s)%997;
+}
+
+function registerForMood(mood,a){
+  if(mood==='lúdica'||mood==='luminosa')return 1;
+  if(mood==='oscura')return -1;
+  if(mood==='tierna')return 0;
+  if(mood==='tensa')return 0;
+  return a.weight>.55?-1:0;
+}
+
+function makeMotif(scale,mood,seed,register){
+  let contours={
+    lúdica:[0,2,4,3,5,2],
+    luminosa:[0,1,3,4,2,5],
+    tierna:[2,1,3,2,4,1],
+    oscura:[5,3,4,2,1,0],
+    tensa:[1,2,1,4,2,5,3],
+    visual:[1,3,2,4,3,1]
+  };
+  let c=(contours[mood]||contours.visual).slice();
+  let rot=seed%c.length;
+  c=c.slice(rot).concat(c.slice(0,rot));
+  return c.map(i=>transposeNote(scale[Math.max(0,Math.min(scale.length-1,i))],register));
+}
+
+function makeAnswer(scale,mood,seed,register){
+  let source=makeMotif(scale,mood,seed+3,register);
+  if(mood==='oscura') return source.slice().reverse().map(n=>transposeNote(n,-1));
+  if(mood==='lúdica') return source.slice(1).concat(source[0]).map(n=>transposeNote(n,1));
+  return source.slice().reverse();
+}
+
+function makeBass(mood,gravity){
+  if(mood==='oscura')return ['A2','E2','C3'];
+  if(mood==='luminosa'||mood==='lúdica')return ['C3','G2','C3'];
+  if(mood==='tierna')return ['F2','C3','F3'];
+  if(gravity>.55)return ['C2','G2','D#2'];
+  return ['C3','G2','D#3'];
+}
+
+function makeHarmony(scale,mood,gravity,brightness){
+  if(mood==='lúdica')return ['C4','G4','E5'];
+  if(mood==='luminosa')return ['D3','A3','F#4'];
+  if(mood==='tierna')return ['F3','C4','A4'];
+  if(mood==='oscura')return ['A2','E3','C4'];
+  if(mood==='tensa')return ['C3','F#3','C#4'];
+  return ['C3','G3','D#4'];
+}
+
+function transposeNote(note,octShift){
+  let m=String(note).match(/^([A-G]#?)(\d)$/);
+  if(!m)return note;
+  return m[1]+Math.max(1,Math.min(7,Number(m[2])+octShift));
+}
+
+function render(a){
+  setM('weight',a.weight);
+  setM('breath',a.breath);
+  setM('order',a.order);
+  setM('emotion',a.emotion.score||0);
+  setM('editorial',a.editorial.quality||0);
+
+  let ww=a.weight>.62?'grave':a.weight>.34?'medio':'liviano';
+  let bw=a.breath>.62?'abierta':a.breath>.36?'contenida':'cerrada';
+  let mood=a.emotion?.mood||'visual';
+  let editorialLabel=a.editorial.score>.62?'friccionada':a.editorial.score>.34?'con tensión':'fluida';
+
+  $('emotionValue').textContent=mood;
+  $('editorialValue').textContent=editorialLabel;
+  $('editorialHint').textContent=editorialHint(a.editorial);
+
+  $('identityMain').textContent=`${ww}, ${bw}, ${mood}`;
+  $('identityText').textContent=`${(a.bodyLines||a.lines).length} líneas base del cuerpo funcionan como entradas y ${a.pars.length} bloques abren cambios de frase. Título y folio se leen como orientación, no como cuerpo. La fluidez editorial aparece ${editorialLabel}.`;
+  $('tags').innerHTML='';
+  ['composición editorial',`${a.bpm} bpm`,`${(a.bodyLines||a.lines).length} líneas cuerpo`,`base ${Math.round(a.baselineGap||0)} px`,mood,editorialLabel,'tempo estable'].forEach(t=>{
+    let s=document.createElement('span');
+    s.className='tag';
+    s.textContent=t;
+    $('tags').appendChild(s);
+  });
+}
+
+function editorialHint(e){
+  let issues=[];
+  if(e.longLine>.18) issues.push('líneas largas');
+  if(e.widow>.30) issues.push('posible viuda interna');
+  if(e.orphan>.30) issues.push('posible huérfana interna');
+  if(e.interruption>.20) issues.push('interrupción de lectura / imagen');
+  if(e.imbalance>.25) issues.push('desequilibrio forma-contraforma');
+  if(!issues.length) return 'La página mantiene buena fluidez: línea base, blancos y bloques no generan fricción fuerte.';
+  return 'Fricción detectada: '+issues.join(', ')+'. La música introduce disonancias y resoluciones incompletas.';
+}
+
+function setM(id,v){$(id+'Value').textContent=Math.round(v*100);$(id+'Bar').style.width=Math.round(v*100)+'%'}
+function clearOv(){overlay.style.display='none';octx.clearRect(0,0,overlay.width,overlay.height)}
+function rect(){let s=$('drop').getBoundingClientRect(),r=preview.getBoundingClientRect();return{x:r.left-s.left,y:r.top-s.top,w:r.width,h:r.height}}
+function drawOv(a,active=null){
+  overlay.width=$('drop').clientWidth*devicePixelRatio;
+  overlay.height=$('drop').clientHeight*devicePixelRatio;
+  overlay.style.width=$('drop').clientWidth+'px';
+  overlay.style.height=$('drop').clientHeight+'px';
+  octx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  octx.clearRect(0,0,$('drop').clientWidth,$('drop').clientHeight);
+  overlay.style.display='block';
+
+  let r=rect(),sx=r.w/a.w,sy=r.h/a.h;
+  octx.strokeStyle='rgba(17,16,14,.45)';
+  octx.setLineDash([5,6]);
+  octx.strokeRect(r.x+a.bbox.x*sx,r.y+a.bbox.y*sy,a.bbox.w*sx,a.bbox.h*sy);
+  octx.setLineDash([]);
+
+  if(a.editorial && a.editorial.imageBlocks){
+    a.editorial.imageBlocks.forEach(b=>{
+      octx.fillStyle='rgba(255,90,44,.11)';
+      octx.fillRect(r.x+b.x*sx,r.y+b.y*sy,b.w*sx,b.h*sy);
+      octx.strokeStyle='rgba(255,90,44,.42)';
+      octx.lineWidth=1.4;
+      octx.strokeRect(r.x+b.x*sx,r.y+b.y*sy,b.w*sx,b.h*sy);
+    });
+  }
+
+  // Título/cabezal: jerarquía, no pulso de cuerpo.
+  (a.titleLines||[]).forEach(l=>{
+    let y=r.y+(l.baseline||l.y)*sy,x=r.x+l.x*sx,w=l.w*sx;
+    octx.strokeStyle='rgba(17,16,14,.32)';
+    octx.lineWidth=2;
+    octx.setLineDash([12,8]);
+    octx.beginPath();octx.moveTo(x,y);octx.lineTo(x+w,y);octx.stroke();
+    octx.setLineDash([]);
+  });
+
+  // Folio: orientación mínima.
+  (a.folioLines||[]).forEach(l=>{
+    let y=r.y+(l.baseline||l.y)*sy,x=r.x+l.x*sx,w=l.w*sx;
+    octx.strokeStyle='rgba(17,16,14,.25)';
+    octx.lineWidth=1;
+    octx.beginPath();octx.arc(x+w/2,y,5,0,Math.PI*2);octx.stroke();
+  });
+
+  let body=a.bodyLines||a.lines||[];
+  body.forEach((l,i)=>{
+    let y=r.y+(l.baseline||l.y)*sy,x=r.x+l.x*sx,w=l.w*sx,act=i===active;
+    octx.strokeStyle=act?'rgba(255,90,44,.95)':'rgba(17,16,14,.18)';
+    octx.lineWidth=act?2.8:1;
+    octx.beginPath();octx.moveTo(x,y);octx.lineTo(x+w,y);octx.stroke();
+  });
+}
+
+async function initInstruments(){
+  if(!window.Tone){
+    throw new Error('Tone.js no cargó');
+  }
+
+  await Tone.start();
+
+  if(samplerReady) return;
+
+  msg('Cargando instrumentos','Descargando piano, cello y percusión. La emoción visual de la página define modo y registro…');
+
+  rev = new Tone.Reverb({decay:4.2, wet:.32}).toDestination();
+  delay = new Tone.FeedbackDelay({delayTime:'8n', feedback:.16, wet:.10}).connect(rev);
+  percBus = new Tone.Gain(.85).connect(rev);
+  stringBus = new Tone.Gain(.72).connect(rev);
+
+  piano = new Tone.Sampler({
+    urls: {
+      "A0":"A0.mp3","C1":"C1.mp3","D#1":"Ds1.mp3","F#1":"Fs1.mp3",
+      "A1":"A1.mp3","C2":"C2.mp3","D#2":"Ds2.mp3","F#2":"Fs2.mp3",
+      "A2":"A2.mp3","C3":"C3.mp3","D#3":"Ds3.mp3","F#3":"Fs3.mp3",
+      "A3":"A3.mp3","C4":"C4.mp3","D#4":"Ds4.mp3","F#4":"Fs4.mp3",
+      "A4":"A4.mp3","C5":"C5.mp3","D#5":"Ds5.mp3","F#5":"Fs5.mp3",
+      "A5":"A5.mp3","C6":"C6.mp3","D#6":"Ds6.mp3","F#6":"Fs6.mp3",
+      "A6":"A6.mp3","C7":"C7.mp3","D#7":"Ds7.mp3","F#7":"Fs7.mp3",
+      "A7":"A7.mp3","C8":"C8.mp3"
+    },
+    release: 2.4,
+    baseUrl: "https://tonejs.github.io/audio/salamander/"
+  }).connect(delay);
+
+  // Cello desde soundfont público. Si alguna nota no carga, la obra sigue con piano + percusión.
+  cello = new Tone.Sampler({
+    urls: {
+      "C2":"C2.mp3",
+      "G2":"G2.mp3",
+      "C3":"C3.mp3",
+      "G3":"G3.mp3",
+      "C4":"C4.mp3"
+    },
+    release: 3.2,
+    baseUrl: "https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/cello-mp3/"
+  }).connect(stringBus);
+
+  drums.kick = new Tone.Player("https://tonejs.github.io/audio/drum-samples/CR78/kick.mp3").connect(percBus);
+  drums.snare = new Tone.Player("https://tonejs.github.io/audio/drum-samples/CR78/snare.mp3").connect(percBus);
+  drums.hat = new Tone.Player("https://tonejs.github.io/audio/drum-samples/CR78/hihat.mp3").connect(percBus);
+
+  try{
+    await Tone.loaded();
+  }catch(e){
+    console.warn('Algún sample no terminó de cargar:', e);
+  }
+
+  samplerReady = true;
+}
+
+$('testBtn').onclick=async()=>{
+  try{
+    await initInstruments();
+    playPiano('C4','8n',.72);
+    setTimeout(()=>playCello('C3','2n',.55),260);
+    setTimeout(()=>playDrum('kick',.75),620);
+    setTimeout(()=>playDrum('hat',.42),820);
+    msg('Instrumentos listos','Prueba: deberías escuchar piano, cello y una percusión real.');
+  }catch(e){
+    console.error(e);
+    msg('Error de samples','No pude cargar los samples. Revisá conexión, GitHub Pages o la consola.');
+  }
+};
+
+$('listenBtn').onclick=()=>A&&startAudio(A,score);
+$('stopBtn').onclick=()=>stopAudio();
+
+async function startAudio(a,plan){
+  try{
+    await initInstruments();
+    stopAudio({silent:true, keepInstruments:true});
+    if(!plan || plan.type!=='composition') plan=buildCompositionPlan(a);
+
+    play.classList.add('on');
+    globalStep=0;
+    plan.runtime=makeCoherentScore(a,plan);
+
+    msg('Composición con tempo',`Lectura ${plan.readingType}: motivo, armonía y pulso estable. No dispara notas sueltas.`);
+
+    startCoherentPlayback(a,plan);
+  }catch(e){
+    console.error(e);
+    msg('Error de audio','No pude iniciar instrumentos. Probá “Probar audio”.');
+  }
+}
+
+function makeCoherentScore(a,plan){
+  let mood=plan.mood||'visual';
+  let scale=plan.scale||scaleFor(a,tones);
+  let root=chooseRoot(mood);
+  let progression=chordProgression(mood,plan);
+  let motifDegrees=motifDegreesFor(mood,plan);
+  let tempo=Math.max(54,Math.min(104,Math.round(plan.bpm || a.bpm || 72)));
+
+  // Si está equilibrada, no se repite más: se vuelve cantable.
+  if(plan.quality>.72 && plan.dissonance<.22){
+    tempo=Math.max(58,tempo-8);
+  }
+  if(mood==='oscura') tempo=Math.max(48,tempo-14);
+  if(mood==='lúdica'||mood==='luminosa') tempo=Math.min(96,tempo+8);
+
+  let pattern=patternFor(mood,plan);
+  let bars=8;
+  let events=[];
+
+  for(let bar=0;bar<bars;bar++){
+    let chord=progression[bar%progression.length];
+    pattern.forEach((p,i)=>{
+      let degree=motifDegrees[(i+bar)%motifDegrees.length];
+      let note=noteFromDegree(root,degree,mood,bar);
+      let step=p.step;
+      let dur=p.dur;
+      let vel=p.vel;
+
+      // Variación controlada: no random. Cada 4 compases contesta.
+      if(bar>=4 && i%2===1) note=stepScale(note, mood==='oscura'?-1:1);
+      if(plan.dissonance>.35 && (bar===3||bar===7) && i===pattern.length-1){
+        note=tenseNeighbor(note);
+        vel+=.06;
+      }
+
+      events.push({bar,step,note,dur,vel,lineIndex:pickLineIndex(a,bar,i),kind:'melody'});
+    });
+
+    // Bajo/cello armónico por compás.
+    events.push({bar,step:0,note:chord.bass,dur:mood==='oscura'?'1n':'2n',vel:.28+plan.gravity*.24,kind:'cello'});
+    if(bar%2===1 && plan.gravity>.42){
+      events.push({bar,step:8,note:chord.fifth,dur:'2n',vel:.20+plan.gravity*.18,kind:'cello'});
+    }
+
+    // Acorde al inicio de frase, no racimo constante.
+    if(bar===0 || bar===4 || (plan.quality>.66 && bar===6)){
+      chord.notes.forEach((n,ci)=>events.push({bar,step:0+ci,note:n,dur:'1n',vel:.18+plan.brightness*.10,kind:'harmony'}));
+    }
+
+    // Percusión real con pulso estable y discreto.
+    if(plan.pulse>.42 || plan.dissonance>.24 || mood==='lúdica'){
+      events.push({bar,step:0,drum:'kick',vel:.20+plan.pulse*.18,kind:'drum'});
+      if(bar%2===0) events.push({bar,step:8,drum:'snare',vel:.12+plan.dissonance*.18,kind:'drum'});
+      [4,12].forEach(st=>events.push({bar,step:st,drum:'hat',vel:.10+plan.spaciousness*.10,kind:'drum'}));
+    }
+
+    // Fricción editorial: cuantizada, puntual, resuelve.
+    if(plan.dissonance>.18 && (bar===2 || bar===6)){
+      events.push({bar,step:6,note:tenseNeighbor(chord.notes[1]),dur:'8n',vel:.16+plan.dissonance*.18,kind:'friction'});
+      events.push({bar,step:7,note:chord.notes[1],dur:'8n',vel:.12+plan.dissonance*.14,kind:'melody'});
+    }
+  }
+
+  return{tempo,bars,events,root,progression};
+}
+
+function startCoherentPlayback(a,plan){
+  let runtime=plan.runtime;
+  let stepMs=(60000/runtime.tempo)/4;
+  let totalSteps=runtime.bars*16;
+
+  tickTimer=setInterval(()=>{
+    let absStep=globalStep%totalSteps;
+    let bar=Math.floor(absStep/16);
+    let step=absStep%16;
+
+    markStep(step);
+    playEventsAt(runtime.events,bar,step,a,plan);
+
+    if(step===0){
+      msg('Componiendo',`Compás ${bar+1}/${runtime.bars} · ${plan.readingType} · ${plan.mood}`);
+    }
+
+    globalStep++;
+  },stepMs);
+
+  // primer pulso inmediato
+  playEventsAt(runtime.events,0,0,a,plan);
+  markStep(0);
+  globalStep=1;
+}
+
+function playEventsAt(events,bar,step,a,plan){
+  events.filter(e=>e.bar===bar&&e.step===step).forEach(e=>{
+    if(e.kind==='melody'){
+      playPiano(e.note,e.dur,e.vel);
+      if(e.lineIndex!==null && e.lineIndex!==undefined) drawOv(a,e.lineIndex);
+    }
+    if(e.kind==='harmony') playPiano(e.note,e.dur,e.vel);
+    if(e.kind==='cello') playCello(e.note,e.dur,e.vel);
+    if(e.kind==='drum') playDrum(e.drum,e.vel);
+    if(e.kind==='friction'){
+      playPiano(e.note,e.dur,e.vel);
+      if(plan.dissonance>.45) playDrum('snare',.10+plan.dissonance*.16);
+    }
+  });
+}
+
+function chooseRoot(mood){
+  if(mood==='oscura')return 'A';
+  if(mood==='luminosa')return 'D';
+  if(mood==='lúdica')return 'C';
+  if(mood==='tierna')return 'F';
+  if(mood==='tensa')return 'C';
+  return 'C';
+}
+
+function chordProgression(mood,plan){
+  if(mood==='oscura'){
+    return[
+      {bass:'A2',fifth:'E3',notes:['A2','E3','C4']},
+      {bass:'F2',fifth:'C3',notes:['F2','C3','A3']},
+      {bass:'E2',fifth:'B2',notes:['E2','B2','G3']},
+      {bass:'A2',fifth:'E3',notes:['A2','E3','C4']}
+    ];
+  }
+  if(mood==='lúdica'||mood==='luminosa'){
+    return[
+      {bass:'C3',fifth:'G3',notes:['C4','E4','G4']},
+      {bass:'G2',fifth:'D3',notes:['G3','B3','D4']},
+      {bass:'A2',fifth:'E3',notes:['A3','C4','E4']},
+      {bass:'F2',fifth:'C3',notes:['F3','A3','C4']}
+    ];
+  }
+  if(mood==='tierna'){
+    return[
+      {bass:'F2',fifth:'C3',notes:['F3','A3','C4']},
+      {bass:'C3',fifth:'G3',notes:['C3','G3','E4']},
+      {bass:'D3',fifth:'A3',notes:['D3','A3','F4']},
+      {bass:'F2',fifth:'C3',notes:['F3','A3','C4']}
+    ];
+  }
+  if(mood==='tensa'||plan.dissonance>.38){
+    return[
+      {bass:'C3',fifth:'G3',notes:['C3','F#3','C4']},
+      {bass:'D#3',fifth:'A#3',notes:['D#3','A3','C#4']},
+      {bass:'G2',fifth:'D3',notes:['G2','D3','F#3']},
+      {bass:'C3',fifth:'G3',notes:['C3','G3','C4']}
+    ];
+  }
+  return[
+    {bass:'C3',fifth:'G3',notes:['C3','G3','D#4']},
+    {bass:'A2',fifth:'E3',notes:['A2','E3','C4']},
+    {bass:'F2',fifth:'C3',notes:['F3','A3','C4']},
+    {bass:'G2',fifth:'D3',notes:['G2','D3','B3']}
+  ];
+}
+
+function motifDegreesFor(mood,plan){
+  if(mood==='oscura')return [5,3,4,2,1,0,2];
+  if(mood==='lúdica')return [0,2,4,5,4,2,6,5];
+  if(mood==='luminosa')return [0,1,3,4,2,5,4];
+  if(mood==='tierna')return [2,1,3,2,4,3,1];
+  if(mood==='tensa')return [1,2,1,4,2,5,3,1];
+  return [1,3,2,4,3,1,0];
+}
+
+function patternFor(mood,plan){
+  if(mood==='oscura'){
+    return[
+      {step:0,dur:'4n',vel:.32},{step:3,dur:'8n',vel:.25},{step:7,dur:'4n',vel:.28},{step:11,dur:'8n',vel:.24},{step:14,dur:'4n',vel:.26}
+    ];
+  }
+  if(mood==='lúdica'||mood==='luminosa'){
+    return[
+      {step:0,dur:'8n',vel:.35},{step:2,dur:'8n',vel:.28},{step:5,dur:'8n',vel:.32},{step:7,dur:'16n',vel:.24},{step:10,dur:'8n',vel:.31},{step:13,dur:'8n',vel:.27}
+    ];
+  }
+  if(mood==='tierna'){
+    return[
+      {step:0,dur:'4n',vel:.30},{step:4,dur:'8n',vel:.24},{step:7,dur:'4n',vel:.27},{step:12,dur:'8n',vel:.22}
+    ];
+  }
+  if(mood==='tensa'||plan.dissonance>.35){
+    return[
+      {step:0,dur:'8n',vel:.30},{step:1,dur:'16n',vel:.22},{step:5,dur:'8n',vel:.28},{step:6,dur:'16n',vel:.20},{step:10,dur:'8n',vel:.31},{step:13,dur:'8n',vel:.24}
+    ];
+  }
+  return[
+    {step:0,dur:'4n',vel:.30},{step:3,dur:'8n',vel:.24},{step:6,dur:'8n',vel:.28},{step:10,dur:'4n',vel:.26},{step:14,dur:'8n',vel:.22}
+  ];
+}
+
+function noteFromDegree(root,degree,mood,bar){
+  let scales={
+    C:['C4','D4','E4','G4','A4','C5','D5','E5'],
+    D:['D3','E3','F#3','A3','B3','D4','E4','F#4'],
+    A:['A2','B2','C3','E3','G3','A3','C4','E4'],
+    F:['F3','G3','A3','C4','D4','F4','G4','A4']
+  };
+  let arr=scales[root]||scales.C;
+  let d=Math.max(0,Math.min(arr.length-1,degree));
+  let note=arr[d];
+  if(mood==='oscura' && bar>=4 && d>2) note=transposeOct(note,-1);
+  return note;
+}
+
+function stepScale(note,dir=1){
+  const order=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  let m=String(note).match(/^([A-G]#?)(\d)$/);
+  if(!m)return note;
+  let i=order.indexOf(m[1]),oct=Number(m[2]);
+  let ni=i+(dir>0?2:-2);
+  if(ni>=order.length){ni-=order.length;oct++;}
+  if(ni<0){ni+=order.length;oct--;}
+  return order[ni]+Math.max(1,Math.min(7,oct));
+}
+
+function transposeOct(note,shift){
+  let m=String(note).match(/^([A-G]#?)(\d)$/);
+  if(!m)return note;
+  return m[1]+Math.max(1,Math.min(7,Number(m[2])+shift));
+}
+
+function pickLineIndex(a,bar,i){
+  let body=a.bodyLines||a.lines||[];
+  if(!body.length)return null;
+  return (bar*2+i*3)%body.length;
+}
+
+function markStep(s){
+  document.querySelectorAll('.step').forEach(e=>e.classList.toggle('active',Number(e.dataset.step)===s));
+}
+
+function playPiano(note,dur,vel){
+  if(piano && samplerReady){
+    try{ piano.triggerAttackRelease(note,dur,undefined,Math.max(.01,Math.min(1,vel))); }catch(e){ console.warn(e); }
+  }
+}
+
+function playCello(note,dur,vel){
+  if(cello && samplerReady){
+    try{ cello.triggerAttackRelease(note,dur,undefined,Math.max(.01,Math.min(1,vel))); }catch(e){ console.warn(e); }
+  }
+}
+
+function playDrum(name,vel=.45){
+  let player=drums[name];
+  if(!player || !samplerReady) return;
+  try{
+    player.volume.value = Tone.gainToDb(Math.max(.01, Math.min(1, vel)));
+    player.start();
+  }catch(e){
+    console.warn('No pudo sonar percusión', name, e);
+  }
+}
+
+function stopAudio(opt={}){
+  if(tickTimer) clearInterval(tickTimer);
+  tickTimer=null;
+
+  compositionTimers.forEach(t=>{try{t.stop()}catch(e){}});
+  compositionTimers=[];
+
+  play.classList.remove('on');
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+
+  if(!opt.silent) msg('Lectura detenida','Composición detenida.');
+}
+
+function clamp(v){return Math.max(0,Math.min(1,v))}
+window.addEventListener('resize',()=>A&&drawOv(A));
+</script></body></html>
